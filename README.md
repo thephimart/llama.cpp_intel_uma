@@ -4,6 +4,8 @@ This repository provides a Windows-first, Intel-optimized llama.cpp setup for Co
 
 Focused testing was performed on Intel Core Ultra 7 155H, but notes are included for Core Ultra 200 and 300 series systems.
 
+“This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults.”
+
 Directory Layout
 C:\llama.cpp
 │
@@ -139,3 +141,4 @@ Iterative refinement workflows
 License
 
 MIT License — use it, fork it, break it, improve it.
+
