@@ -37,7 +37,7 @@ cd C:\
 git clone https://github.com/thephimart/llama.cpp_intel_uma.git llama.cpp
 
 
-Download the latest llama.cpp SYCL release
+Download the latest llama.cpp SYCL release https://github.com/ggml-org/llama.cpp/releases
 Extract it to:
 
 C:\llama.cpp\sycl
@@ -143,5 +143,6 @@ Iterative refinement workflows
 License
 
 MIT License — use it, fork it, break it, improve it.
+
 
 
