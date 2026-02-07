@@ -1,171 +1,141 @@
-llama.cpp Intel UMA (Windows / Core Ultra Focus)
+llama.cpp Intel UMA (Core Ultra / ARC iGPU)
 
-This repository contains a Windows-focused llama.cpp setup and tuning guide, tested primarily on Intel Core Ultra 7 155H (Meteor Lake, UMA) systems using the SYCL backend.
+This repository provides a Windows-first, Intel-optimized llama.cpp setup for Core Ultra systems using Intel ARC / XPU via SYCL.
 
-The goal is simple:
+Focused testing was performed on Intel Core Ultra 7 155H, but notes are included for Core Ultra 200 and 300 series systems.
 
-sane defaults
-
-reproducible performance
-
-minimal friction for running large GGUF models on Intel UMA hardware
-
-This repo provides:
-
-a base global config plus per-model configs
-
-a PowerShell launch script
-
-documentation for tuning on Intel Core Ultra systems
-
-a clean directory layout you can clone directly to C:\
-
-Tested Hardware Focus
-
-Primary testing platform:
-
-Intel Core Ultra 7 155H
-
-P-cores + E-cores fully utilized
-
-LP-E cores intentionally left unused
-
-Intel ARC iGPU (UMA)
-
-Windows 11
-
-llama.cpp SYCL releases
-
-Other Intel Core Ultra systems may work well, but settings here are tuned and validated against the 155H specifically. See /docs/guides/core_ultra_200_and_300_series_notes.md for forward-looking notes on newer generations.
-
-Repository Layout
-
-Expected directory structure after setup:
-
+Directory Layout
 C:\llama.cpp
 │
-├─ configs
-│   ├─ base.cfg
-│   └─ per-model configs (.cfg)
+├─ configs\
+│   ├─ ZZZ-Base-*.cfg          # Global base configuration
+│   └─ per-model configs
 │
-├─ sycl
-│   └─ llama.cpp SYCL release files
-│      (llama-cli.exe, llama-server.exe, etc)
+├─ sycl\
+│   └─ llama.cpp SYCL release
+│       ├─ llama-server.exe
+│       └─ llama-cli.exe
 │
-├─ docs
-│   └─ guides
+├─ doc\
+│   └─ guides\
 │
-├─ README.md
-├─ COMPACT.md
 ├─ start-llama-server.ps1
+├─ COMPACT.md
 ├─ llama.cpp model folder.lnk
 ├─ llama.ico
-└─ LICENSE
+└─ README.md
 
-Quick Start (Windows)
-1. Clone the Repository
+Installation
 
-Open PowerShell and run:
+Clone this repo directly into C:\:
 
 cd C:\
 git clone https://github.com/thephimart/llama.cpp_intel_uma.git llama.cpp
 
 
-This clones the repo directly into:
-
-C:\llama.cpp
-
-2. Download llama.cpp SYCL Release
-
-Download the latest llama.cpp SYCL Windows release
-
-Extract it into:
+Download the latest llama.cpp SYCL release
+Extract it to:
 
 C:\llama.cpp\sycl
 
 
-After extraction, you should see files like:
+Place GGUF models in:
 
-llama-cli.exe
+%USERPROFILE%\AppData\Local\llama.cpp
 
-llama-server.exe
 
-inside C:\llama.cpp\sycl
+(Or let Hugging Face downloads populate it automatically.)
 
-3. Models Folder
+Starting the Server
 
-This repo includes a shortcut:
-
-llama.cpp model folder.lnk
-
-It points to your models directory using environment variables (no hardcoded paths).
-This is the default save location when running llama-cli or llama-server with the -hf arguement.
-
-4. Start the Server
-
-Run the PowerShell script:
+Run:
 
 .\start-llama-server.ps1
 
 
-This script:
+The launcher will guide you through:
 
-loads the base global config
+WebUI on/off
 
-applies sane defaults for Intel UMA
+Local-only vs LAN access
 
-launches llama-server.exe with SYCL support
+Port selection
 
-You can modify or extend this script once per-model configs are added.
+Model selection:
 
-Base Global Config Philosophy
+Local GGUF
 
-The base config is designed to:
+Hugging Face repo
 
-favor CPU + iGPU cooperation
+Or no model
 
-keep thermals under control
+Optional runtime config overlay
 
-avoid pathological memory pressure
+Configuration System
+Base Config (Required)
 
-perform well for large context, long-running sessions
+A single base config is auto-detected:
 
-Highlights:
+configs\ZZZ-Base-*.cfg
 
---n-gpu-layers 0
-Enables CPU-first scheduling while still allowing iGPU offload, and is required for Flash Attention + KV cache quantization.
 
-tuned thread count for P/E cores
+This file defines:
 
-high but stable batch / ubatch sizes
+Threading
 
-aggressive KV cache quantization for large models
+Batch sizes
 
---cache-ram -1 for massive wins on long-running workloads
+KV cache quantization
 
-Full details are documented in /docs/guides/.
+Parallelism
 
-COMPACT.md
+Cache behavior
 
-COMPACT.md is an in-progress prompt and workflow for aggressively squeezing context during long sessions (coding, refactors, document iteration).
+It is always applied first.
 
-It’s not finalized — treat it as experimental.
+Per-Model Configs (Optional)
 
-Notes on Other Intel Core Ultra Generations
+After selecting a model, you may apply one additional config.
 
-While this repo is focused on the 155H, newer Intel Core Ultra 200/300 series systems may benefit from:
+These are layered after the base config and are ideal for:
 
-different batch size plateaus
+Context size overrides
 
-altered UMA behavior
+Model-specific batch tuning
 
-improved iGPU scheduling
+Vision (--mmproj) models
+
+Intel SYCL / ARC Notes
+
+The launcher sets:
+
+SYCL_DEVICE_FILTER=level_zero:gpu
+SYCL_UR_USE_LEVEL_ZERO_V2=1
+
+
+This enables:
+
+ARC iGPU / XPU acceleration
+
+Flash Attention (required for KV cache quantization)
+
+Efficient UMA memory sharing
+
+Context Compaction
 
 See:
 
-/docs/guides/core_ultra_200_and_300_series_notes.md
+COMPACT.md
+
+
+For the recommended context compaction prompt, designed for:
+
+Long coding sessions
+
+Large-context models
+
+Iterative refinement workflows
 
 License
 
 MIT License — use it, fork it, break it, improve it.
-
