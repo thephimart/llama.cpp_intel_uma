@@ -99,7 +99,7 @@ This repo includes a shortcut:
 llama.cpp model folder.lnk
 
 It points to your models directory using environment variables (no hardcoded paths).
-Place your GGUF models there, or update the shortcut if you prefer a different location.
+This is the default save location when running llama-cli or llama-server with the -hf arguement.
 
 4. Start the Server
 
@@ -168,3 +168,4 @@ See:
 License
 
 MIT License — use it, fork it, break it, improve it.
+
