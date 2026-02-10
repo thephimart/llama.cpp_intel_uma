@@ -67,9 +67,37 @@ Run the interactive launcher:
 ```powershell
 .\start-llama-server.ps1
 ```
-Alternatively, right-click the script in explorer: Send to > Desktop (create shortcut)
-Rename it as you see fit, and link it to the icon provided, llama.ico
-Then simply put it into your start menu, pin it to start, pin it to taskbar, whatever you prefer.
+
+### Creating a Shortcut
+
+**Method 1: Desktop Shortcut**
+1. Right-click `start-llama-server.ps1` in File Explorer
+2. Select **Send to > Desktop (create shortcut)**
+3. Right-click the new shortcut and select **Properties**
+4. Click **Change Icon...** and browse to `C:\llama.cpp\llama.ico`
+5. Rename the shortcut (e.g., "Llama Server")
+
+**Method 2: Start Menu Pinning**
+
+*Option A - From Desktop:*
+1. Create the desktop shortcut using Method 1 above
+2. Right-click the shortcut and select **Pin to Start**
+
+*Option B - Direct to Start Menu:*
+1. Press `Win + R`, type `shell:Start Menu` and press Enter
+2. Navigate to `Programs` folder
+3. Right-click and select **New > Shortcut**
+4. Browse to `C:\llama.cpp\start-llama-server.ps1`
+5. Name it "Llama Server" and click **Finish**
+6. Right-click the shortcut > **Properties** > **Change Icon...**
+7. Browse to `C:\llama.cpp\llama.ico` and apply
+
+**Method 3: Taskbar Pinning**
+1. First create a desktop shortcut using Method 1
+2. Right-click the shortcut and select **Pin to taskbar**
+3. Or drag the shortcut directly to the taskbar
+
+> 💡 **Tip**: The provided `llama.ico` file gives your shortcut a professional appearance in the Start Menu, taskbar, and desktop.
 
 ### Configuration Workflow
 
