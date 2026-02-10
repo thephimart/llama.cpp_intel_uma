@@ -1,7 +1,5 @@
 # llama.cpp Intel UMA (Core Ultra / ARC iGPU)
 
-> **⚠️ Work in progress** - The repo looks messy, but the tuning is solid for 155H
-
 This repository provides a Windows-first, Intel-optimized llama.cpp setup for Core Ultra systems using Intel ARC / XPU via SYCL.
 
 **🎯 Focused testing** was performed on Intel Core Ultra 7 155H, with notes for Core Ultra 200 and 300 series systems.
