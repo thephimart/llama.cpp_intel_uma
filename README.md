@@ -2,7 +2,7 @@
 
 This repository provides a Windows-first, Intel-optimized llama.cpp setup for Core Ultra systems using Intel ARC / XPU via SYCL.
 
-**🎯 Focused testing** was performed on Intel Core Ultra 7 155H, with notes for Core Ultra 200 and 300 series systems.
+**🎯 Focused testing** was performed on Intel Core Ultra 7 155H with 96GB RAM, with notes for Core Ultra 200 and 300 series systems.
 
 > 💡 **Philosophy**: "This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults."
 
