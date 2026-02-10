@@ -192,7 +192,16 @@ This enables:
 
 > ⚠️ **Important**: `--n-gpu-layers 0` is required in base config to enable flash attention.
 
-## 📚 Context Compaction
+## 📚 Documentation
+
+Detailed configuration and tuning guides for Intel Core Ultra systems:
+
+| Document | Description |
+|----------|-------------|
+| [Core Ultra 7 155H Base Config](docs/core-ultra-155h-base-config.md) | Complete base configuration guide for Intel Core Ultra 7 155H (Meteor Lake) |
+| [Core Ultra 200 & 300 Series Notes](docs/core-ultra-200-and-300-series-notes.md) | Tuning guidance for Core Ultra 200-series (Lunar Lake) and 300-series (Arrow Lake) |
+
+## 📦 Context Compaction
 
 See [COMPACT.md](COMPACT.md) for the recommended context compaction prompt, designed for:
 
