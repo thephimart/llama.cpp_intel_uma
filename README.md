@@ -1,176 +1,180 @@
-llama.cpp Intel UMA (Core Ultra / ARC iGPU)
+# llama.cpp Intel UMA (Core Ultra / ARC iGPU)
 
-** Be warned the repo looks a mess, work in progress, but the actual tuning is solid for 155H **
+> **⚠️ Work in progress** - The repo looks messy, but the tuning is solid for 155H
 
 This repository provides a Windows-first, Intel-optimized llama.cpp setup for Core Ultra systems using Intel ARC / XPU via SYCL.
 
-Focused testing was performed on Intel Core Ultra 7 155H, but notes are included for Core Ultra 200 and 300 series systems.
+**🎯 Focused testing** was performed on Intel Core Ultra 7 155H, with notes for Core Ultra 200 and 300 series systems.
 
-“This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults.”
+> 💡 **Philosophy**: "This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults."
 
-```
-What this repo is          | What this repo is not
--------------------------- | ----------------------------
-Intel UMA–tuned            | CUDA defaults copy-pasted
-Thermal-aware              | Max-fans benchmark chasing
-Long-context focused       | Short prompt demo rigs
-```
+| What this repo is | What this repo is not |
+|-------------------|----------------------|
+| Intel UMA–tuned | CUDA defaults copy-pasted |
+| Thermal-aware | Max-fans benchmark chasing |
+| Long-context focused | Short prompt demo rigs |
 
+## 📁 Directory Layout
 
-Directory Layout
 ```
 C:\llama.cpp
 │
-├─ configs\
+├─ configs\                      # Configuration files
 │   ├─ ZZZ-Base-*.cfg          # Global base configuration
-│   └─ per-model configs
+│   └─ *.cfg                   # Model-specific overrides
 │
-├─ sycl\
+├─ sycl\                        # llama.cpp SYCL build
 │   └─ llama.cpp SYCL release
 │       ├─ llama-server.exe
 │       └─ llama-cli.exe
 │
-├─ doc\
+├─ docs\                        # Documentation
 │   └─ guides\
 │
-├─ start-llama-server.ps1
-├─ COMPACT.md
-├─ llama.cpp model folder.lnk
-├─ llama.ico
-└─ README.md
+├─ start-llama-server.ps1       # Main launcher script
+├─ COMPACT.md                   # Context compaction guide
+├─ llama.cpp model folder.lnk   # Model folder shortcut
+├─ llama.ico                    # Icon
+└─ README.md                    # This file
 ```
 
-Installation
+## 🚀 Installation
 
-Clone this repo directly into C:\:
-```
+### 1. Clone Repository
+Clone this repo directly into `C:\`:
+```bash
 cd C:\
 git clone https://github.com/thephimart/llama.cpp_intel_uma.git llama.cpp
 ```
 
-Download the latest llama.cpp SYCL release
-
-https://github.com/ggml-org/llama.cpp/releases
+### 2. Download llama.cpp SYCL Release
+Get the latest release from:
+[https://github.com/ggml-org/llama.cpp/releases](https://github.com/ggml-org/llama.cpp/releases)
 
 Extract it to:
 ```
 C:\llama.cpp\sycl
 ```
 
+### 3. Models
 Place GGUF models in:
 ```
 %USERPROFILE%\AppData\Local\llama.cpp
 ```
+> 💡 Or let Hugging Face downloads populate it automatically.
 
-(Or let Hugging Face downloads populate it automatically.)
+## 🖥️ Starting the Server
 
-Starting the Server
-
-Run:
-```
+Run the interactive launcher:
+```powershell
 .\start-llama-server.ps1
 ```
 
-The launcher will guide you through:
-```
-WebUI on/off
-```
-```
-Local-only vs LAN access
-```
-```
-Port selection
-```
-```
-Model selection:
-```
-```
-Local GGUF
-```
-```
-Hugging Face repo
-```
-```
-Or no model
-```
+### Configuration Workflow
 
-Optional runtime config overlay
+The launcher automatically sets Intel SYCL environment variables and guides you through:
 
-Configuration System
-Base Config (Required)
+1. **Backend** - Shows selected backend (SYCL for Intel GPU/XPU)
 
-A single base config is auto-detected:
+2. **WebUI Toggle** 
+   - Default: Disabled (`--no-webui`)
+   - Option [1]: Enable web interface
+
+3. **Network Mode**
+   - [1] Local only (127.0.0.1) - Default
+   - [2] Shared / LAN (0.0.0.0)
+
+4. **Port Configuration**
+   - Default: 11434 (Ollama-compatible)
+   - Custom port supported
+
+5. **Model Selection**
+   - **[0]** No model (server-only mode)
+   - **[H]** Hugging Face repository  
+     (e.g., `unsloth/Qwen3-VL-30B-A3B-Thinking-GGUF:Q8_0`)
+   - **[1-N]** Local GGUF files from `%USERPROFILE%\AppData\Local\llama.cpp`
+
+6. **Base Config Selection**
+   - **[0]** No base config (use llama.cpp defaults)
+   - **[1]** ZZZ-Base-Config.cfg (default) - Standard chat/completion config
+   - **[2]** ZZZ-Base-Embed-Config.cfg - Embedding-optimized config (no batch sizes)
+
+7. **Runtime Config Override**
+   - **[0]** No extra config
+   - **[1-N]** Other `*.cfg` files (excluding `ZZZ-Base` files)
+
+8. **Final Configuration Review**
+   - Complete summary before launch
+   - Option to restart configuration or proceed
+
+### Validation & Safety
+
+- Automatically validates `llama-server.exe` exists in `sycl\` directory
+- Verifies `--mmproj` files exist before launching vision models
+- Shows complete command line before execution
+- Supports retry on configuration errors
+
+## ⚙️ Configuration System
+
+### Base Config (Required)
+
+Base configs are auto-detected from:
 ```
 configs\ZZZ-Base-*.cfg
 ```
-This file defines:
-```
-Threading
 
-Batch sizes
+Two base configurations are available:
 
-KV cache quantization
+**1. ZZZ-Base-Config.cfg** (default) - Standard configuration for chat/completion models:
+- 🧵 **Threading** - 20 threads
+- 📦 **Batch sizes** - 256 batch / 128 micro-batch
+- 🗄️ **KV cache quantization** - q8_0 for both K and V
+- ⚡ **Parallelism** - Single parallel request
+- 💾 **Cache behavior** - Automatic RAM cache (`-1`)
 
-Parallelism
+**2. ZZZ-Base-Embed-Config.cfg** - Optimized for embedding models:
+- Same as base but without batch size constraints
+- Ideal for embedding and retrieval workloads
 
-Cache behavior
-```
-It is always applied first.
+> ℹ️ Base configs are always applied first before per-model overrides.
 
+### Per-Model Configs (Optional)
 
-Per-Model Configs (Optional)
-
-After selecting a model, you may apply one additional config.
+After selecting a model, you may apply one additional config file.
 
 These are layered after the base config and are ideal for:
-```
-Context size overrides
+- 📏 **Context size overrides** - Custom context lengths
+- 🔧 **Model-specific batch tuning** - Per-model optimization
+- 👁️ **Vision models** - `--mmproj` configurations
 
-Model-specific batch tuning
+## 🔧 Intel SYCL / ARC Notes
 
-Vision (--mmproj) models
-```
-
-Intel SYCL / ARC Notes
-
-The launcher sets:
-```
+The launcher automatically sets these environment variables:
+```bash
 SYCL_DEVICE_FILTER=level_zero:gpu
 SYCL_UR_USE_LEVEL_ZERO_V2=1
 ```
 
 This enables:
+- 🚀 **ARC iGPU / XPU acceleration** - Hardware acceleration
+- 💪 **Above 4GB Allocation** - Large model support
+- ⚡ **Flash Attention** - Required for KV cache quantization
+- 🔄 **Efficient UMA memory sharing** - Unified memory architecture
 
-ARC iGPU / XPU acceleration
+> ⚠️ **Important**: `--n-gpu-layers 0` is required in base config to enable flash attention.
 
-Above 4GB Allocation
+## 📚 Context Compaction
 
-Flash Attention (required for KV cache quantization)
-(`--n-gpu-layers 0` required in base config to enable flash attention)
+See [COMPACT.md](COMPACT.md) for the recommended context compaction prompt, designed for:
 
-Efficient UMA memory sharing
+- 💻 **Long coding sessions**
+- 🌐 **Large-context models**
+- 🔄 **Iterative refinement workflows**
 
-
-Context Compaction
-
-See:
-
-COMPACT.md
-
-For the recommended context compaction prompt, designed for:
-
-Long coding sessions
-
-Large-context models
-
-Iterative refinement workflows
-
-
-License
+## 📄 License
 
 MIT License — use it, fork it, break it, improve it.
 
+---
 
-
-
-
+**🎉 Happy inference!** If you find this useful, consider giving it a ⭐!
