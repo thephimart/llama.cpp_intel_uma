@@ -4,7 +4,7 @@ This repository provides a Windows-first, Intel-optimized llama.cpp setup for Co
 
 **🎯 Focused testing** was performed on Intel Core Ultra 7 155H with 96GB RAM, with notes for Core Ultra 200 and 300 series systems.
 
-> 💡 **Philosophy**: "This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults."
+> 💡 "This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults."
 
 | What this repo is | What this repo is not |
 |-------------------|----------------------|
@@ -18,13 +18,13 @@ This repository provides a Windows-first, Intel-optimized llama.cpp setup for Co
 C:\llama.cpp
 │
 ├─ configs\                      # Configuration files
-│   ├─ ZZZ-Base-*.cfg          # Global base configuration
+│   ├─ ZZZ-Base-*.cfg          # Global base configurations
 │   └─ *.cfg                   # Model-specific overrides
 │
 ├─ sycl\                        # llama.cpp SYCL build
-│   └─ llama.cpp SYCL release
-│       ├─ llama-server.exe
-│       └─ llama-cli.exe
+│   ├─ llama.cpp SYCL release
+│   ├─ llama-server.exe
+│   └─ llama-cli.exe
 │
 ├─ docs\                        # Documentation
 │   └─ guides\
@@ -146,6 +146,8 @@ The launcher automatically sets Intel SYCL environment variables and guides you 
 ## ⚙️ Configuration System
 
 ### Base Config (Required)
+
+See [docs/core-ultra-155h-base-config.md](docs/core-ultra-155h-base-config.md) for detailed configuration explanations.
 
 Base configs are auto-detected from:
 ```
