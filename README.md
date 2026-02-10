@@ -67,6 +67,9 @@ Run the interactive launcher:
 ```powershell
 .\start-llama-server.ps1
 ```
+Alternatively, right-click the script in explorer: Send to > Desktop (create shortcut)
+Rename it as you see fit, and link it to the icon provided, llama.ico
+Then simply put it into your start menu, pin it to start, pin it to taskbar, whatever you prefer.
 
 ### Configuration Workflow
 
