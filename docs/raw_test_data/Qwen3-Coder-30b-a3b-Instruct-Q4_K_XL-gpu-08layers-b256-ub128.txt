@@ -1,0 +1,11 @@
+--n-gpu-layers 8
+--threads 20
+--batch-size 256
+--ubatch-size 128
+--jinja
+--parallel 1
+--cache-ram -1
+
+prompt eval time =   38933.18 ms /   957 tokens (   40.68 ms per token,    24.58 tokens per second)
+       eval time =  213351.27 ms /  1245 tokens (  171.37 ms per token,     5.84 tokens per second)
+      total time =  252284.45 ms /  2202 tokens

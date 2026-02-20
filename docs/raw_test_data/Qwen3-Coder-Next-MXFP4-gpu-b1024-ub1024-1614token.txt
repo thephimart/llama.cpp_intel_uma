@@ -1,0 +1,13 @@
+--n-gpu-layers 99
+--threads 20
+--batch-size 1024
+--ubatch-size 1024
+--jinja
+--parallel 1
+--cache-ram -1
+
+51.5/54.3GB shared 'vram' default setting, adjustable for 155h since last intel gpu driver update Feb 15, 2026.
+
+prompt eval time =   52027.01 ms /  1614 tokens (   32.23 ms per token,    31.02 tokens per second)
+       eval time = 1067590.52 ms /  3198 tokens (  333.83 ms per token,     3.00 tokens per second)
+      total time = 1119617.53 ms /  4812 tokens

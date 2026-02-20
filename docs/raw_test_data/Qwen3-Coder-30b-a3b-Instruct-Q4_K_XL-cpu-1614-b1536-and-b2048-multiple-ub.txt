@@ -1,0 +1,82 @@
+Input prompt of 1614 tokens
+
+======================
+Qwen3-Coder-30B-A3B-Instruct-Q4_K_XL.GGUF
+--n-gpu-layers 0
+--threads 20
+--cache-type-k q8_0
+--cache-type-v q8_0
+--jinja
+--parallel 1
+--cache-ram -1
+--split-mode row
+--no-context-shift
+--ctx-size 98304
+--n-predict 32768
+--temp 0.7
+--top-k 20
+--top-p 0.8
+--min-p 0.0
+--repeat-penalty 1.05
+
+======= --batch-size 1536 =======
+--ubatch-size 384
+prompt eval time =   46136.81 ms /  1614 tokens (   28.59 ms per token,    34.98 tokens per second)
+       eval time =  180297.83 ms /  1676 tokens (  107.58 ms per token,     9.30 tokens per second)
+      total time =  226434.63 ms /  3290 tokens
+
+--ubatch-size 512
+prompt eval time =   42422.85 ms /  1614 tokens (   26.28 ms per token,    38.05 tokens per second)
+       eval time =  151769.80 ms /  1437 tokens (  105.62 ms per token,     9.47 tokens per second)
+      total time =  194192.65 ms /  3051 tokens
+
+--ubatch-size 768
+prompt eval time =   38169.32 ms /  1614 tokens (   23.65 ms per token,    42.29 tokens per second)
+       eval time =  168780.71 ms /  1579 tokens (  106.89 ms per token,     9.36 tokens per second)
+      total time =  206950.03 ms /  3193 tokens
+
+--ubatch-size 1024
+prompt eval time =   38296.81 ms /  1614 tokens (   23.73 ms per token,    42.14 tokens per second)
+       eval time =  155821.61 ms /  1478 tokens (  105.43 ms per token,     9.49 tokens per second)
+      total time =  194118.42 ms /  3092 tokens
+
+--ubatch-size 1536
+prompt eval time =   36167.90 ms /  1614 tokens (   22.41 ms per token,    44.63 tokens per second)
+       eval time =  160417.64 ms /  1451 tokens (  110.56 ms per token,     9.05 tokens per second)
+      total time =  196585.53 ms /  3065 tokens
+
+======= --batch-size 2048 =======
+--ubatch-size 512
+prompt eval time =   42164.35 ms /  1614 tokens (   26.12 ms per token,    38.28 tokens per second)
+       eval time =  135762.99 ms /  1302 tokens (  104.27 ms per token,     9.59 tokens per second)
+      total time =  177927.35 ms /  2916 tokens
+
+--ubatch-size 768
+prompt eval time =   38288.57 ms /  1614 tokens (   23.72 ms per token,    42.15 tokens per second)
+       eval time =  138845.12 ms /  1338 tokens (  103.77 ms per token,     9.64 tokens per second)
+      total time =  177133.69 ms /  2952 tokens
+
+--ubatch-size 1024
+prompt eval time =   35472.55 ms /  1614 tokens (   21.98 ms per token,    45.50 tokens per second)
+       eval time =  166802.32 ms /  1566 tokens (  106.51 ms per token,     9.39 tokens per second)
+      total time =  202274.88 ms /  3180 tokens
+
+--ubatch-size 1280
+prompt eval time =   35653.04 ms /  1614 tokens (   22.09 ms per token,    45.27 tokens per second)
+       eval time =  137757.24 ms /  1319 tokens (  104.44 ms per token,     9.57 tokens per second)
+      total time =  173410.28 ms /  2933 tokens
+
+--ubatch-size 1536
+prompt eval time =   35345.64 ms /  1614 tokens (   21.90 ms per token,    45.66 tokens per second)
+       eval time =  179222.05 ms /  1672 tokens (  107.19 ms per token,     9.33 tokens per second)
+      total time =  214567.69 ms /  3286 tokens
+
+--ubatch-size 1792
+prompt eval time =   32111.19 ms /  1614 tokens (   19.90 ms per token,    50.26 tokens per second)
+       eval time =  165997.25 ms /  1562 tokens (  106.27 ms per token,     9.41 tokens per second)
+      total time =  198108.44 ms /  3176 tokens
+
+--ubatch-size 2048
+prompt eval time =   32300.60 ms /  1614 tokens (   20.01 ms per token,    49.97 tokens per second)
+       eval time =  157433.62 ms /  1494 tokens (  105.38 ms per token,     9.49 tokens per second)
+      total time =  189734.22 ms /  3108 tokens

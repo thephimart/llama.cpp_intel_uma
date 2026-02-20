@@ -1,0 +1,18 @@
+# ================= CONFIG =================
+$BasePath    = "C:\llama.cpp"
+$BackendName = "SYCL (Intel GPU / XPU)"
+$SyclPath    = Join-Path $BasePath "sycl"
+$LlamaPath   = $SyclPath
+$ConfigPath  = Join-Path $BasePath "configs"
+$DefaultPort = 11434
+$LlamaCache  = "$env:USERPROFILE\AppData\Local\llama.cpp"
+# ================= SYCL ===================
+# set sycl device
+$env:SYCL_DEVICE_FILTER="level_zero:gpu"
+# allow over 4gb allocations
+$env:SYCL_UR_USE_LEVEL_ZERO_V2="1"
+# force kv cache to cpu (intel uma specific)
+$env:GGML_SYCL_FORCE_CPU_KV="1"
+# verbose console output
+$env:SYCL_UR_TRACE="1"
+# ==========================================

@@ -1,0 +1,184 @@
+INSTRUCTIONS (do not summarize or skip):
+You must carefully read, retain, and reason over all of the following material.
+After reading, you will be asked to perform a structured analysis that depends on details spread throughout the entire text.
+Accuracy, consistency, and long-context retention are required.
+
+Part 1 — Background Narrative
+
+The following describes a fictional software system named Helios, designed as a modular inference runtime for heterogeneous hardware. Helios supports CPU, GPU, and accelerator backends, with a focus on long-context workloads.
+
+Helios is composed of five primary subsystems:
+
+Orion — the execution planner
+
+Atlas — the memory manager
+
+Vega — the scheduling and batching layer
+
+Nyx — the attention and cache subsystem
+
+Echo — the I/O and streaming interface
+
+Each subsystem communicates via explicit message passing. There is no shared global state except through Atlas.
+
+Orion is responsible for constructing execution graphs. Once constructed, graphs are immutable. Orion prefers static graphs and will only recompile if tensor shapes or backend placement changes.
+
+Atlas manages all tensor allocations. Atlas tracks residency, lifetime, and reuse. Atlas distinguishes between:
+
+short-lived activations
+
+long-lived parameters
+
+persistent caches
+
+Atlas is bandwidth-aware but not latency-aware.
+
+Vega groups incoming work into batches. Vega supports two parameters:
+
+Batch size: maximum number of tokens queued
+
+Microbatch size: maximum number of tokens executed per step
+
+Vega’s goal is to maximize throughput while respecting backend constraints.
+
+Nyx implements scaled dot-product attention. Nyx supports:
+
+standard attention
+
+tiled attention
+
+cache-aware attention
+
+Nyx does not support flash attention. Nyx may optionally quantize key/value caches, but only when running on CPU.
+
+Echo handles token streaming, cancellation, and backpressure.
+
+Part 2 — Hardware Profiles
+
+Helios was tested on three hardware profiles:
+
+Profile A — CPU-Only
+
+8 performance cores
+
+Shared L3 cache
+
+High branch prediction accuracy
+
+No accelerator support
+
+Profile B — UMA GPU
+
+Integrated GPU sharing system memory
+
+High memory bandwidth sensitivity
+
+High kernel launch overhead
+
+Limited cache per execution unit
+
+Profile C — Accelerator
+
+Fixed-function neural accelerator
+
+Optimized for static graphs
+
+Poor support for dynamic control flow
+
+No support for autoregressive loops
+
+Part 3 — Observed Behaviors
+
+During testing, the following behaviors were observed:
+
+On Profile A, increasing batch size beyond a moderate threshold caused diminishing returns due to cache pressure.
+
+On Profile B, increasing batch size improved prefill throughput up to a point, after which memory bandwidth saturation caused stalls.
+
+On Profile B, large microbatch sizes significantly degraded decode latency.
+
+On Profile C, models with dynamic sequence lengths failed to compile efficiently.
+
+Additionally:
+
+Quantized key/value caches reduced memory traffic significantly.
+
+Disabling cache quantization increased decode latency at large context sizes.
+
+Attention cost scaled super-linearly with context length.
+
+Systems optimized for short prompts often underperformed on long prompts.
+
+Part 4 — Configuration Experiments
+
+The following configurations were tested:
+
+Configuration 1:
+
+Batch size: 256
+
+Microbatch size: 128
+
+Accelerator offload: disabled
+
+Configuration 2:
+
+Batch size: 512
+
+Microbatch size: 128
+
+Accelerator offload: enabled for all layers
+
+Configuration 3:
+
+Batch size: 256
+
+Microbatch size: 32
+
+Accelerator offload: enabled for early layers only
+
+Configuration 4:
+
+Batch size: 128
+
+Microbatch size: 32
+
+Accelerator offload: disabled
+
+Results showed that Configuration 1 and 3 had similar total wall-clock time on long contexts, despite very different execution characteristics.
+
+Part 5 — Constraints and Tradeoffs
+
+Key constraints identified during the study:
+
+Memory bandwidth was the dominant bottleneck at large context sizes.
+
+Kernel launch overhead dominated small, frequent execution steps.
+
+Static graph compilation improved performance predictability.
+
+Dynamic backend switching introduced unacceptable overhead.
+
+Tradeoffs included:
+
+Throughput vs latency
+
+Memory locality vs parallelism
+
+Static optimization vs flexibility
+
+Part 6 — Final Task (this is what the model must answer)
+
+Using only the information provided above:
+
+Identify which subsystem is most sensitive to microbatch size, and explain why.
+
+Explain why Profile B experiences degraded decode performance at large microbatch sizes.
+
+Compare Configuration 1 and Configuration 3, and explain how they can achieve similar wall-clock time despite different hardware utilization.
+
+State under which conditions Profile A would outperform Profile B.
+
+Explain why Profile C is unsuitable for autoregressive decoding.
+
+Your answer must be structured, internally consistent, and must reference details from multiple sections of the text.
