@@ -6,8 +6,14 @@ $LlamaPath   = $SyclPath
 $ConfigPath  = Join-Path $BasePath "configs"
 $DefaultPort = 11434
 $LlamaCache  = "$env:USERPROFILE\AppData\Local\llama.cpp"
+# ================= SYCL ===================
+# set sycl device
 $env:SYCL_DEVICE_FILTER="level_zero:gpu"
-$env:SYCL_UR_USE_LEVEL_ZERO_V2 = "1"
+# allow over 4gb allocations
+$env:SYCL_UR_USE_LEVEL_ZERO_V2="1"
+# force kv cache to cpu (intel uma specific)
+$env:GGML_SYCL_FORCE_CPU_KV="1"
+# verbose console output
 #$env:SYCL_UR_TRACE="1"
 # ==========================================
 
@@ -208,10 +214,6 @@ do {
     }
 
     # ---------- Launch ----------
-    Write-Host "`nLaunching llama-server...`n"
-    Write-Host "`nCommand line:"
-    Write-Host "$Exe $($cmd -join ' ')"
-
     $cmd = @()
 
     if (-not $EnableWebUI) {
@@ -232,6 +234,17 @@ do {
     $cmd += $BaseArgs
     $cmd += $ExtraArgs
 
+    # ----- PRINT FINAL COMMAND -----
+    $PrintableCmd = $cmd | ForEach-Object {
+        if ($_ -match '\s') { '"' + $_ + '"' } else { $_ }
+    }
+
+    Write-Host "`nLaunching llama-server..."
+    Write-Host "`nFinal command line:"
+    Write-Host "$Exe $($PrintableCmd -join ' ')"
+    Write-Host ""
+
+    # ----- EXECUTE -----
     & $Exe @cmd
 
 break
