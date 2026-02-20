@@ -126,7 +126,8 @@ The launcher automatically sets Intel SYCL environment variables and guides you 
 6. **Base Config Selection**
    - **[0]** No base config (use llama.cpp defaults)
    - **[1]** ZZZ-Base-Config.cfg (default) - Standard chat/completion config
-   - **[2]** ZZZ-Base-Embed-Config.cfg - Embedding-optimized config (no batch sizes)
+   - **[2]** ZZZ-Base-Config-Large-Context.cfg - Large Context chat/completion config
+   - **[3]** ZZZ-Base-Embed-Config.cfg - Embedding-optimized config (no batch sizes)
 
 7. **Runtime Config Override**
    - **[0]** No extra config
@@ -160,7 +161,7 @@ Three base configurations are available:
 
 **1. ZZZ-Base-Config.cfg** (default) - Standard configuration for chat/completion models:
 - **Threading** - 20 threads
-- **Batch sizes** - 2048 batch / 2048 micro-batch
+- **Batch sizes** - 2048 batch / 1024 micro-batch
 - **KV cache quantization** - q8_0 for both K and V
 - **Parallelism** - Single parallel request
 - **Cache behavior** - Automatic RAM cache (`-1`)

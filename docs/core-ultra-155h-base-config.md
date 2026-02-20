@@ -30,7 +30,7 @@ This configuration treats prefill as an upfront cost and optimizes for uninterru
 --n-gpu-layers 0
 --threads 20
 --batch-size 2048
---ubatch-size 2048
+--ubatch-size 1024
 --cache-type-k q8_0
 --cache-type-v q8_0
 --jinja
@@ -103,7 +103,7 @@ The Core Ultra 7 155H exposes 22 logical threads, but using all of them is not o
 
 This setting fully utilizes P-cores and E-cores without overcommitting the CPU.
 
-### `--batch-size 2048` / `--ubatch-size 2048`
+### `--batch-size 2048` / `--ubatch-size 1024`
 
 This platform tolerates *much larger batches* than initially expected.
 
@@ -116,7 +116,7 @@ This platform tolerates *much larger batches* than initially expected.
 - Tokens/sec degradation flattens as context grows
 - Long uninterrupted generation benefits more than short prompts
 
-**Why 2048 / 2048 works here:**
+**Why 2048 / 1024 works here:**
 
 - 96GB UMA removes memory pressure
 - Meteor Lake handles wide batches gracefully

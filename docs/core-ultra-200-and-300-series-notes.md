@@ -92,7 +92,7 @@ Similar rule to 155H:
 
 ```
 batch 2048
-ubatch 2048
+ubatch 1024
 ```
 
 On Core Ultra 200 / 300:
