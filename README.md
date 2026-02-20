@@ -176,7 +176,7 @@ Three base configurations are available:
 - Same as base but without batch size constraints
 - Ideal for embedding and retrieval workloads
 
-> ℹBase configs are always applied first before per-model overrides.
+> ℹ️ **Note:** Base configs are always applied first before per-model overrides.
 
 ### Per-Model Configs (Optional)
 
@@ -227,6 +227,8 @@ Detailed configuration and tuning guides for Intel Core Ultra systems:
 |----------|-------------|
 | [Core Ultra 7 155H Base Config](docs/core-ultra-155h-base-config.md) | Complete base configuration guide for Intel Core Ultra 7 155H (Meteor Lake) |
 | [Core Ultra 200 & 300 Series Notes](docs/core-ultra-200-and-300-series-notes.md) | Tuning guidance for Core Ultra 200-series (Lunar Lake) and 300-series (Arrow Lake) |
+| [Qwen3-Coder-30B Testing Analysis](docs/testing-qwen3-coder-30b-analysis.md) | Batch scaling, CPU vs GPU offload, and UMA behavior for 30B MoE model |
+| [Qwen3-Coder-Next-80B Testing Analysis](docs/testing-qwen3-coder-next-analysis.md) | Batch ceiling and throughput plateaus for 80B sparse-MoE model |
 
 ## Context Compaction
 
