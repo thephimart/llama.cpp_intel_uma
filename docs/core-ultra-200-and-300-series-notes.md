@@ -8,7 +8,7 @@ This document covers what carries over unchanged versus what likely shifts for C
 - Threading will change
 - Batch / ubatch plateaus will move
 - UMA behavior improves, especially on Lunar Lake
-- You'll probably end up with slightly larger batches on 200/300 than 155H
+- You will almost certainly tolerate *equal or larger batches* than 155H, especially on Lunar Lake.
 - Not a rewrite — more like a retune.
 
 ---
@@ -86,42 +86,30 @@ Similar rule to 155H:
 - Leave scheduler headroom
 - Expect sweet spot around ~80–85% of logical threads
 
-### 2. Batch / UBatch Sizes (Moderate Change)
+### 2. Batch / UBatch Sizes (More Important Than Expected)
 
-This is where ARC + memory improvements start to matter.
-
-#### On 155H
-
-You found:
+155H validated stable operation at:
 
 ```
-batch 256
-ubatch 128
+batch 2048
+ubatch 2048
 ```
 
-near the top of the plateau.
-
-#### On 200 / 300 Series
+On Core Ultra 200 / 300:
 
 **Expect:**
 
-- Higher sustained memory bandwidth
-- Lower memory latency
-- Better UMA coherency with iGPU
-- That usually shifts the plateau upward, not sideways.
+- Equal or higher batch ceilings
+- Lower relative prefill cost
+- Even flatter context scaling curves
 
-**Likely new ranges:**
+Especially on Lunar Lake:
 
-```
---batch-size 320–384
---ubatch-size 160–192
-```
+- Improved memory fabric
+- Stronger UMA coherency
+- Reduced CPU ↔ iGPU stalls
 
-**Key point:**
-
-You won't get dramatically higher peak t/s, but you'll get flatter degradation curves as context grows.
-
-That matters a lot more in real use.
+Large batches become *more correct*, not less.
 
 ### 3. UMA & iGPU Interaction (Quiet but Important Upgrade)
 
@@ -164,24 +152,21 @@ If anything, newer ARC makes this more viable, not less.
 
 ## What Might Change Later (Optional Tweaks)
 
-Not base-config material yet, but worth noting:
-
 Some models may benefit from:
 
-- Slightly higher ubatch than batch / 2
 - Different KV quant mix (bf16/q8) on small models only
 - Larger L3 caches may reduce sensitivity to ubatch tuning
 
 But those belong in per-model overrides, not the global config.
+KV cache is still recommended on CPU by default, though future ARC generations may revisit this assumption.
 
 ---
 
 ## Big Picture Takeaway
 
-Your 155H config is philosophically correct, not just empirically tuned.
+155H config is philosophically correct, just not empirically tuned for 200/300 series.
 
 **On Core Ultra 200 / 300:**
 
 - You'll retune the numbers
 - You won't change the approach
-- That's exactly what you want in a base global config.

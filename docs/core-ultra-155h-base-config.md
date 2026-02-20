@@ -20,6 +20,8 @@ This config is designed to be safe, stable, and performant across a wide range o
 
 This is not a synthetic benchmark config. It is a "turn it on and forget it" setup.
 
+This configuration treats prefill as an upfront cost and optimizes for uninterrupted generation — exactly how real work behaves.
+
 ---
 
 ## Base Global Configuration
@@ -27,14 +29,39 @@ This is not a synthetic benchmark config. It is a "turn it on and forget it" set
 ```
 --n-gpu-layers 0
 --threads 20
---batch-size 256
---ubatch-size 128
+--batch-size 2048
+--ubatch-size 2048
 --cache-type-k q8_0
 --cache-type-v q8_0
 --jinja
 --parallel 1
 --cache-ram -1
 ```
+
+This configuration reflects **validated real-world stability**, not conservative defaults.
+
+## Large Context Variant (Optional)
+
+For extremely long sessions, the following variant is recommended:
+
+```
+--split-mode row
+--no-context-shift
+```
+
+**Why this matters:**
+
+- Disables implicit sliding window behavior
+- Prevents unpredictable KV eviction
+- Makes compaction explicit and controllable
+- Improves determinism during long code iteration
+
+This mode pairs best with:
+- Manual compaction prompts
+- `--cache-ram -1`
+- Large batches
+
+It trades flexibility for correctness — a good trade at large scale.
 
 ---
 
@@ -76,21 +103,61 @@ The Core Ultra 7 155H exposes 22 logical threads, but using all of them is not o
 
 This setting fully utilizes P-cores and E-cores without overcommitting the CPU.
 
-### `--batch-size 256` / `--ubatch-size 128`
+### `--batch-size 2048` / `--ubatch-size 2048`
 
-Both values are set near the top of the performance plateau.
+This platform tolerates *much larger batches* than initially expected.
 
-**Observed behavior:**
+**Observed behavior from extended testing:**
 
-- Smaller batches underutilize execution units
-- Larger batches increase memory pressure with minimal gains
-- These values strike the best balance for Meteor Lake's memory hierarchy
+- Large batches significantly reduce scheduling overhead
+- Prefill becomes heavier, but:
+  - Cache-ram amortizes it
+  - Generation remains stable
+- Tokens/sec degradation flattens as context grows
+- Long uninterrupted generation benefits more than short prompts
 
-In short: wide enough to be efficient, not so wide that memory bandwidth becomes the bottleneck.
+**Why 2048 / 2048 works here:**
+
+- 96GB UMA removes memory pressure
+- Meteor Lake handles wide batches gracefully
+- Large contexts (>20k) benefit disproportionately
+
+This configuration favors:
+- Long coding sessions
+- Large document iteration
+- Compaction-driven workflows
+
+It is *not* optimized for short interactive prompts — and that is intentional.
+
+## Context Scaling Behavior (Important)
+
+This configuration has been validated up to ~40k active context with:
+
+- Gradual, not exponential, throughput decline
+- ~20–25% tokens/sec reduction at ~22–30k context
+- Flattening degradation curve beyond that
+
+Key observation:
+
+> Prefill cost increases linearly, but generation cost grows sub-linearly.
+
+This makes **compaction + cache-ram** the dominant strategy rather than aggressive context shifting.
 
 ### `--cache-type-k q8_0` / `--cache-type-v q8_0`
 
 KV cache quantization is one of the biggest wins on this platform.
+
+**Implementation note (Intel UMA):**
+
+KV cache is explicitly forced to CPU memory via:
+
+```
+GGML_SYCL_FORCE_CPU_KV=1
+```
+
+This avoids UMA contention and improves stability with large batches and long contexts.
+On Meteor Lake, this produces more consistent performance than allowing automatic
+KV placement.
 
 **Testing results:**
 
@@ -190,16 +257,20 @@ For real workloads, this is a net win.
 
 **Extensively tested:**
 
-- LFM2.5-1.2B (thinking & instruct, bf16)
+- Qwen3-Coder-30b-a3b-Instruct (Q4_K_XL)
+- Qwen3-Coder-Next-80b-MoE
+- LFM2.5-1.2b (thinking & instruct, bf16)
+
+**Moderately tested:**
+
+- GLM-4.6v-Flash (q5_K_M)
 - gpt-oss-20b (MXFP4)
 - GLM-4.7-Flash (q5_K_M)
 - Trinity-Mini (q5_K_M)
-- Qwen3-Coder-Next-MXFP4-MoE
 
 **Additionally validated:**
 
 - Falcon-H1R-7B (q5_K_M)
-- GLM-4.6v-Flash (q5_K_M)
 - Nemotron-Cascade-14B-Thinking (q5_K_M)
 - Qwen3-VL-30B-A3B-Thinking (q5_K_M)
 - Qwen3-1.7B (thinking/instruct, q5_K_M)

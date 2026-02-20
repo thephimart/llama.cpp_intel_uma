@@ -14,5 +14,5 @@ $env:SYCL_UR_USE_LEVEL_ZERO_V2="1"
 # force kv cache to cpu (intel uma specific)
 $env:GGML_SYCL_FORCE_CPU_KV="1"
 # verbose console output
-$env:SYCL_UR_TRACE="1"
+#$env:SYCL_UR_TRACE="1"
 # ==========================================

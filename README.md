@@ -2,9 +2,9 @@
 
 This repository provides a Windows-first, Intel-optimized llama.cpp setup for Core Ultra systems using Intel ARC / XPU via SYCL.
 
-**🎯 Focused testing** was performed on Intel Core Ultra 7 155H with 96GB RAM, with notes for Core Ultra 200 and 300 series systems.
+**Focused testing** was performed on Intel Core Ultra 7 155H with 96GB RAM, with notes for Core Ultra 200 and 300 series systems.
 
-> 💡 "This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults."
+> "This repo exists because Intel UMA deserves real tuning, not copy-pasted CUDA defaults."
 
 | What this repo is | What this repo is not |
 |-------------------|----------------------|
@@ -12,7 +12,7 @@ This repository provides a Windows-first, Intel-optimized llama.cpp setup for Co
 | Thermal-aware | Max-fans benchmark chasing |
 | Long-context focused | Short prompt demo rigs |
 
-## 📁 Directory Layout
+## Directory Layout
 
 ```
 C:\llama.cpp
@@ -36,7 +36,7 @@ C:\llama.cpp
 └─ README.md                    # This file
 ```
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone Repository
 Clone this repo directly into `C:\`:
@@ -59,9 +59,9 @@ Place GGUF models in:
 ```
 %USERPROFILE%\AppData\Local\llama.cpp
 ```
-> 💡 Or let Hugging Face downloads populate it automatically.
+> Or let Hugging Face downloads populate it automatically.
 
-## 🖥️ Starting the Server
+## Starting the Server
 
 Run the interactive launcher:
 ```powershell
@@ -97,7 +97,7 @@ Run the interactive launcher:
 2. Right-click the shortcut and select **Pin to taskbar**
 3. Or drag the shortcut directly to the taskbar
 
-> 💡 **Tip**: The provided `llama.ico` file gives your shortcut a professional appearance in the Start Menu, taskbar, and desktop.
+> **Tip**: The provided `llama.ico` file gives your shortcut a professional appearance in the Start Menu, taskbar, and desktop.
 
 ### Configuration Workflow
 
@@ -143,58 +143,83 @@ The launcher automatically sets Intel SYCL environment variables and guides you 
 - Shows complete command line before execution
 - Supports retry on configuration errors
 
-## ⚙️ Configuration System
+## Configuration System
 
 ### Base Config (Required)
 
 See [docs/core-ultra-155h-base-config.md](docs/core-ultra-155h-base-config.md) for detailed configuration explanations.
 
-Base configs are auto-detected from:
+Current base configs are tuned aggressively for large-context and long-running workloads.
+Earlier documentation referenced smaller batch sizes; those values have been superseded.
+
 ```
 configs\ZZZ-Base-*.cfg
 ```
 
-Two base configurations are available:
+Three base configurations are available:
 
 **1. ZZZ-Base-Config.cfg** (default) - Standard configuration for chat/completion models:
-- 🧵 **Threading** - 20 threads
-- 📦 **Batch sizes** - 256 batch / 128 micro-batch
-- 🗄️ **KV cache quantization** - q8_0 for both K and V
-- ⚡ **Parallelism** - Single parallel request
-- 💾 **Cache behavior** - Automatic RAM cache (`-1`)
+- **Threading** - 20 threads
+- **Batch sizes** - 2048 batch / 2048 micro-batch
+- **KV cache quantization** - q8_0 for both K and V
+- **Parallelism** - Single parallel request
+- **Cache behavior** - Automatic RAM cache (`-1`)
+- Optimized for large-context, long-running inference
 
-**2. ZZZ-Base-Embed-Config.cfg** - Optimized for embedding models:
+**2. ZZZ-Base-Config-Large-Context.cfg**
+- Same as above, plus:
+  - `--split-mode row`
+  - `--no-context-shift`
+- Intended for extreme context growth and compaction workflows
+
+**3. ZZZ-Base-Embed-Config.cfg** - Optimized for embedding models:
 - Same as base but without batch size constraints
 - Ideal for embedding and retrieval workloads
 
-> ℹ️ Base configs are always applied first before per-model overrides.
+> ℹBase configs are always applied first before per-model overrides.
 
 ### Per-Model Configs (Optional)
 
 After selecting a model, you may apply one additional config file.
 
 These are layered after the base config and are ideal for:
-- 📏 **Context size overrides** - Custom context lengths
-- 🔧 **Model-specific batch tuning** - Per-model optimization
-- 👁️ **Vision models** - `--mmproj` configurations
+- **Context size overrides** - Custom context lengths
+- **Model-specific batch tuning** - Per-model optimization
+- **Vision models** - `--mmproj` configurations
 
-## 🔧 Intel SYCL / ARC Notes
+## Intel SYCL / ARC Notes
 
 The launcher automatically sets these environment variables:
 ```bash
 SYCL_DEVICE_FILTER=level_zero:gpu
 SYCL_UR_USE_LEVEL_ZERO_V2=1
+GGML_SYCL_FORCE_CPU_KV=1
 ```
+### KV Cache Placement (Intel UMA)
+
+On Intel UMA systems, KV cache is explicitly forced to CPU memory:
+```
+GGML_SYCL_FORCE_CPU_KV=1
+```
+This is intentional and recommended.
+
+**Why:**
+- Prevents iGPU memory pressure at large context sizes
+- Reduces UMA contention
+- Improves stability with large batches and long-running sessions
+- Produces more predictable performance on Meteor Lake
+
+The iGPU is still used opportunistically for compute, but KV cache remains CPU-resident.
 
 This enables:
-- 🚀 **ARC iGPU / XPU acceleration** - Hardware acceleration
-- 💪 **Above 4GB Allocation** - Large model support
-- ⚡ **Flash Attention** - Required for KV cache quantization
-- 🔄 **Efficient UMA memory sharing** - Unified memory architecture
+- **ARC iGPU / XPU acceleration** - Hardware acceleration
+- **Above 4GB Allocation** - Large model support
+- **Flash Attention** - Required for KV cache quantization (for almost all models, there are exceptions)
+- **Efficient UMA memory sharing** - Unified memory architecture
 
-> ⚠️ **Important**: `--n-gpu-layers 0` is required in base config to enable flash attention.
+> **Important**: `--n-gpu-layers 0` is required in base config to enable flash attention.
 
-## 📚 Documentation
+## Documentation
 
 Detailed configuration and tuning guides for Intel Core Ultra systems:
 
@@ -203,18 +228,18 @@ Detailed configuration and tuning guides for Intel Core Ultra systems:
 | [Core Ultra 7 155H Base Config](docs/core-ultra-155h-base-config.md) | Complete base configuration guide for Intel Core Ultra 7 155H (Meteor Lake) |
 | [Core Ultra 200 & 300 Series Notes](docs/core-ultra-200-and-300-series-notes.md) | Tuning guidance for Core Ultra 200-series (Lunar Lake) and 300-series (Arrow Lake) |
 
-## 📦 Context Compaction
+## Context Compaction
 
 See [COMPACT.md](COMPACT.md) for the recommended context compaction prompt, designed for:
 
-- 💻 **Long coding sessions**
-- 🌐 **Large-context models**
-- 🔄 **Iterative refinement workflows**
+- **Long coding sessions**
+- **Large-context models**
+- **Iterative refinement workflows**
 
-## 📄 License
+## License
 
 MIT License — use it, fork it, break it, improve it.
 
 ---
 
-**🎉 Happy inference!** If you find this useful, consider giving it a ⭐!
+**Happy inference!** If you find this useful, consider giving it a ⭐!
